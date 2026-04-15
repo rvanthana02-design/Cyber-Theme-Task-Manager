@@ -1,154 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Task Manager</title>
-
-<style>
-:root {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: #fff;
-  --accent: #6366f1;
-}
-
-body.light {
-  --bg: #f1f5f9;
-  --card: #fff;
-  --text: #000;
-}
-
-body {
-  margin: 0;
-  font-family: Arial;
-  background: var(--bg);
-  color: var(--text);
-  transition: 0.3s;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-h1 {
-  text-align: center;
-}
-
-.card {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-}
-
-input, select {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 8px;
-  border: none;
-}
-
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
-}
-
-.task {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  margin-top: 10px;
-  background: #334155;
-  border-radius: 10px;
-}
-
-.task.done {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
-
-.priority-high { color: red; }
-.priority-medium { color: orange; }
-.priority-low { color: lightgreen; }
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.progress {
-  height: 10px;
-  background: #475569;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress-bar {
-  height: 100%;
-  background: lime;
-  width: 0%;
-  border-radius: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-  <h1>✨ Premium Task Manager</h1>
-
-  <div class="card">
-    <input id="taskInput" placeholder="Enter task">
-    <input type="date" id="dueDate">
-    
-    <select id="priority">
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-    </select>
-
-    <select id="category">
-      <option>Work</option>
-      <option>Personal</option>
-      <option>Study</option>
-    </select>
-
-    <button onclick="addTask()">Add</button>
-  </div>
-
-  <div class="card top-bar">
-    <input id="search" placeholder="Search..." oninput="renderTasks()">
-    
-    <select id="filter" onchange="renderTasks()">
-      <option value="all">All</option>
-      <option value="done">Completed</option>
-      <option value="pending">Pending</option>
-    </select>
-
-    <button onclick="toggleMode()">🌙</button>
-  </div>
-
-  <div class="card">
-    <div class="progress">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-  </div>
-
-  <div id="taskList"></div>
-</div>
-
 <script>
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let editIndex = -1;
 
 function save() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -191,25 +43,69 @@ function renderTasks() {
     const div = document.createElement("div");
     div.className = "task " + (t.done ? "done" : "");
 
-    div.innerHTML = `
-      <div>
-        <b>${t.text}</b><br>
-        <small>${t.date || ""} | ${t.category}</small><br>
-        <span class="priority-${t.priority}">
-          ${t.priority.toUpperCase()}
-        </span>
-      </div>
+    if (editIndex === i) {
+      div.innerHTML = `
+        <input id="editText" value="${t.text}">
+        <input type="date" id="editDate" value="${t.date}">
+        
+        <select id="editPriority">
+          <option ${t.priority==="low"?"selected":""}>low</option>
+          <option ${t.priority==="medium"?"selected":""}>medium</option>
+          <option ${t.priority==="high"?"selected":""}>high</option>
+        </select>
 
-      <div>
-        <button onclick="toggleTask(${i})">✔</button>
-        <button onclick="deleteTask(${i})">❌</button>
-      </div>
-    `;
+        <select id="editCategory">
+          <option ${t.category==="Work"?"selected":""}>Work</option>
+          <option ${t.category==="Personal"?"selected":""}>Personal</option>
+          <option ${t.category==="Study"?"selected":""}>Study</option>
+        </select>
+
+        <button onclick="saveEdit(${i})">💾</button>
+        <button onclick="cancelEdit()">❌</button>
+      `;
+    } else {
+      div.innerHTML = `
+        <div>
+          <b>${t.text}</b><br>
+          <small>${t.date || ""} | ${t.category}</small><br>
+          <span class="priority-${t.priority}">
+            ${t.priority.toUpperCase()}
+          </span>
+        </div>
+
+        <div>
+          <button onclick="toggleTask(${i})">✔</button>
+          <button onclick="startEdit(${i})">✏️</button>
+          <button onclick="deleteTask(${i})">🗑️</button>
+        </div>
+      `;
+    }
 
     list.appendChild(div);
   });
 
   updateProgress();
+}
+
+function startEdit(i) {
+  editIndex = i;
+  renderTasks();
+}
+
+function cancelEdit() {
+  editIndex = -1;
+  renderTasks();
+}
+
+function saveEdit(i) {
+  tasks[i].text = document.getElementById("editText").value;
+  tasks[i].date = document.getElementById("editDate").value;
+  tasks[i].priority = document.getElementById("editPriority").value;
+  tasks[i].category = document.getElementById("editCategory").value;
+
+  editIndex = -1;
+  save();
+  renderTasks();
 }
 
 function toggleTask(i) {
@@ -237,6 +133,3 @@ function updateProgress() {
 
 renderTasks();
 </script>
-
-</body>
-</html>
