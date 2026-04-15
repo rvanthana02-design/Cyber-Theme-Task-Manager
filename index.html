@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Task Manager</title>
+    <style>
+        /* CSS - Design Section */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; color: #333; }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button#add-btn {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        ul { list-style: none; padding: 0; }
+        li {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .delete-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>My Tasks</h2>
+    
+    <div class="input-group">
+        <input type="text" id="taskInput" placeholder="Enna vela seiyanum?">
+        <button id="add-btn" onclick="addTask()">Add</button>
+    </div>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    /* JavaScript - Logic Section */
+
+    // 1. Task-ah add panna
+    function addTask() {
+        let input = document.getElementById("taskInput");
+        let taskValue = input.value;
+
+        if (taskValue === "") {
+            alert("Ethachum type pannunga!");
+            return;
+        }
+
+        let ul = document.getElementById("taskList");
+        let li = document.createElement("li");
+
+        li.innerHTML = `
+            <span onclick="toggleComplete(this)">${taskValue}</span>
+            <button class="delete-btn" onclick="deleteTask(this)">Delete</button>
+        `;
+
+        ul.appendChild(li);
+        input.value = ""; // Input-ah clear panna
+    }
+
+    // 2. Task-ah complete-nu mark panna
+    function toggleComplete(element) {
+        element.classList.toggle("completed");
+    }
+
+    // 3. Task-ah delete panna
+    function deleteTask(element) {
+        element.parentElement.remove();
+    }
+</script>
+
+</body>
+</html>
