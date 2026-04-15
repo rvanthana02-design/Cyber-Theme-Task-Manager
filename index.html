@@ -108,7 +108,7 @@
         <h2>My Daily Task</h2>
         
         <div class="input-section">
-            <input type="text" id="taskInput" placeholder="Command: Task Name">
+            <input type="text" id="taskInput" placeholder="Enter Your Task Name">
             <input type="date" id="dateInput">
             
             <div class="time-dropdown-row">
@@ -125,13 +125,12 @@
                     <option value="30">30</option><option value="45">45</option>
                 </select>
                 <select id="ampmInput">
-                    <option value="">AM/PM</option>
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
                 </select>
             </div>
             
-            <button class="btn add-btn" id="saveBtn" onclick="addOrUpdateTask()">Execute Entry</button>
+            <button class="btn add-btn" id="saveBtn" onclick="addOrUpdateTask()">Add Task</button>
         </div>
 
         <div class="filters">
@@ -158,7 +157,7 @@
 
         // STRICT POLICY check
         if (!title || !date || !h || !m || !p) {
-            return alert("STRICT PROTOCOL: All fields (Task, Date, and Time) are required!");
+            return alert("All fields (Task, Date, and Time) are required!");
         }
 
         const fullTime = `${h}:${m} ${p}`;
@@ -166,7 +165,7 @@
         if (editId !== null) {
             tasks = tasks.map(t => t.id === editId ? {...t, title, date, time: fullTime} : t);
             editId = null;
-            document.getElementById("saveBtn").innerText = "Execute Entry";
+            document.getElementById("saveBtn").innerText = "Add Task";
         } else {
             tasks.push({ id: Date.now(), title, date, time: fullTime, completed: false });
         }
